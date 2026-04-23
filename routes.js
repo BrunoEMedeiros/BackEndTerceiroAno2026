@@ -33,4 +33,21 @@ rotas.post("/login", async (req, res) => {
   return res.status(401).json("email não cadastrado");
 });
 
+rotas.post("/imagem", async (req, res) => {
+  //Quando criar o objeto que sera enviado no front-end, ajuste para que os nomes "batam" com esses
+  if (!req.files || !req.files.imagem) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  const { name, data, mimetype } = req.files.imagem;
+
+  await sql`insert into imagens (descricao, data, mimetype) values(${name}, ${data}, ${mimetype})`;
+  return res.status(201).json({ msg: "imagem cadastrada!" });
+});
+
+rotas.get("/imagens", async (req, res) => {
+  const imagens = await sql`select * from imagens`;
+
+  return res.status(200).json(imagens);
+});
 export default rotas;
