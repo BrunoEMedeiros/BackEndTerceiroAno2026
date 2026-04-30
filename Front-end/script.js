@@ -1,10 +1,14 @@
 const api = "http://192.168.1.15:3000";
 const div = document.querySelector("#container");
 
-window.onload = carregarImagem();
+window.onload = carregarProdutos();
 
 document.getElementById("uploadBtn").addEventListener("click", async () => {
   const fileInput = document.getElementById("imageInput");
+
+  const descricao = document.querySelector("#descricao").value;
+  const preco = document.querySelector("#preco").value;
+  const estoque = document.querySelector("#estoque").value;
 
   //Uma condiconal apenas para checar se o usuário selecionou um arquivo
   if (fileInput.files.length === 0) {
@@ -19,6 +23,9 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   const formData = new FormData();
 
   //Anexando a imagem ao fomulario
+  formData.append("descricao", descricao);
+  formData.append("preco", preco);
+  formData.append("estoque", estoque);
   formData.append("imagem", imageFile);
 
   // ----------------------- MUITO IMPORTANTE ------------------------
@@ -28,44 +35,61 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   // o navegador automaticamente ira criar as configurações necessárias para o envio
   // se passar manualmente o navegador vai "quebrar".
 
+  console.log(formData);
   try {
-    const response = await fetch(`${api}/imagem`, {
+    const response = await fetch(`${api}/produto`, {
       method: "POST",
       body: formData,
     });
 
     if (response.status == 201) {
-      alert("Imagem adicionada");
+      alert("Produto cadastrado");
+      carregarProdutos();
     } else {
-      console.error("Upload failed with status:", response.status);
-      alert("Upload failed.");
+      console.error("Error:", response.status);
+      alert("Erro ao cadastrar produto");
     }
   } catch (error) {
     console.error("Network error during upload:", error);
   }
 });
 
-async function carregarImagem() {
-  const resposta = await fetch(`${api}/imagens`);
+async function carregarProdutos() {
+  div.innerHTML = "";
+  const resposta = await fetch(`${api}/produtos`);
 
-  const imagens = await resposta.json();
+  const produtos = await resposta.json();
 
-  if (imagens.length == 0) {
+  if (produtos.length == 0) {
     const text = document.createElement("p");
-    text.innerText = "Nenhuma imagem cadastrada";
+    text.innerText = "Nenhuma produto cadastrado";
     div.appendChild(text);
     return;
   }
 
-  imagens.map((imagem) => {
-    const byteArray = new Uint8Array(imagem.data.data);
+  produtos.map((produto) => {
+    const container = document.createElement("div");
+    container.className = "produtos";
+
+    const descricao = document.createElement("p");
+    descricao.innerHTML = produto.descricao;
+
+    const preco = document.createElement("p");
+    preco.innerHTML = produto.preco;
+
+    const estoque = document.createElement("p");
+    estoque.innerHTML = produto.estoque;
+
+    const byteArray = new Uint8Array(produto.data.data);
     const blob = new Blob([byteArray], { type: "image/png" });
     const url = URL.createObjectURL(blob);
     const img = document.createElement("img");
     img.src = url;
-    img.style.width = "200px";
-    img.style.height = "200px";
-    div.appendChild(img);
+    img.style.width = "50px";
+    img.style.height = "50px";
+
+    container.append(descricao, preco, estoque, img);
+    div.appendChild(container);
   });
 
   return;

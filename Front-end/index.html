@@ -7,9 +7,25 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <input type="file" id="imageInput" accept="image/*" />
-    <button id="uploadBtn">Cadastrar imagem</button>
-    <div id="container"></div>
+    <main>
+      <div id="formulario">
+        <div>
+          <label for="descricao">Descrição</label>
+          <input type="text" name="descricao" id="descricao" />
+        </div>
+        <div>
+          <label for="descricao">Preço</label>
+          <input type="number" name="preco" id="preco" />
+        </div>
+        <div>
+          <label for="descricao">Estoque</label>
+          <input type="text" name="estoque" id="estoque" />
+        </div>
+        <input type="file" id="imageInput" accept="image/*" />
+        <button id="uploadBtn">Cadastrar produto</button>
+      </div>
+      <div id="container"></div>
+    </main>
     <script src="./script.js"></script>
   </body>
 </html>
