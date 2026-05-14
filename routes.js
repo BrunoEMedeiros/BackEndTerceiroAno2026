@@ -10,20 +10,40 @@ rotas.get("/pessoas", async (req, res) => {
 });
 
 rotas.post("/pessoas", async (req, res) => {
-  const { nome, email, senha } = req.body;
-
-  const hash = await CriarHash(senha);
-
-  await sql`insert into pessoa(nome, email, senha) values(${nome}, ${email}, ${hash})`;
-
-  return res.status(201).json("Cadastrado");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const senhaRegex =
+    /(?=^.{8,}$)((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+  try {
+    const { nome, email, senha } = req.body;
+    if (!nome || !email || !senha) {
+      return res.status(400).json("Preencha todos os campos!");
+    }
+    if (nome.length < 5) {
+      return res.status(400).json("Nome muito curto!");
+    }
+    if (!emailRegex.test(email)) {
+      return res.status(400).json("Email inválido");
+    }
+    if (!senhaRegex.test(senha)) {
+      return res.status(400).json("Senha inválida");
+    }
+    const hash = await CriarHash(senha);
+    await sql`insert into pessoa(nome, email, senha) values(${nome}, ${email}, ${hash})`;
+    return res.status(201).json("Cadastrado");
+  } catch (error) {
+    console.error("Erro ao cadastrar nova conta: " + error);
+    return res.status(500).json("Erro inesperado");
+  }
 });
 
 rotas.post("/login", async (req, res) => {
   const { email, senha } = req.body;
+
   const usuario = await sql`select senha from pessoa where email = ${email} `;
 
-  if (usuario[0].length != 0) {
+  console.log(usuario.length);
+
+  if (usuario.length != 0) {
     const teste = await CompararSenha(senha, usuario[0].senha);
     if (teste) {
       return res.status(200).json("Bem vindo");
@@ -74,4 +94,5 @@ rotas.get("/imagens", async (req, res) => {
 
   return res.status(200).json(imagens);
 });
+
 export default rotas;

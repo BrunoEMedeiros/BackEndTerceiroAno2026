@@ -4,7 +4,7 @@ const div = document.querySelector("#container");
 window.onload = carregarProdutos();
 
 document.getElementById("uploadBtn").addEventListener("click", async () => {
-  const fileInput = document.getElementById("imageInput");
+  const fileInput = document.querySelector("#imageInput");
 
   const descricao = document.querySelector("#descricao").value;
   const preco = document.querySelector("#preco").value;
@@ -35,7 +35,6 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   // o navegador automaticamente ira criar as configurações necessárias para o envio
   // se passar manualmente o navegador vai "quebrar".
 
-  console.log(formData);
   try {
     const response = await fetch(`${api}/produto`, {
       method: "POST",
